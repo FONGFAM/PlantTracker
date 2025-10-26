@@ -9,7 +9,6 @@ com/planttracker/Models/PlantTypes.class
 com/planttracker/Services/ReportService.class
 com/planttracker/Services/CareScheduleService.class
 com/planttracker/Models/Users.class
-com/planttracker/Services/ChatGPTAIService.class
 com/planttracker/Repositories/RoleRepository.class
 com/planttracker/Controllers/PlantTypeController.class
 com/planttracker/Controllers/PlantAnalyticsController.class
@@ -33,7 +32,6 @@ com/planttracker/Controllers/PlantController.class
 com/planttracker/dto/PlantAnalyticsDTO.class
 com/planttracker/Controllers/ReportController.class
 com/planttracker/Services/PlantReportService.class
-com/planttracker/Models/CareSchedules.class
 com/planttracker/Models/Plants.class
 com/planttracker/Services/CustomUserDetailsService.class
 com/planttracker/dto/LoginRequest.class
@@ -41,4 +39,5 @@ com/planttracker/Repositories/UserRepository.class
 com/planttracker/Controllers/PlantStatusController.class
 com/planttracker/Services/PlantAnalyticsService.class
 com/planttracker/Repositories/CareScheduleRepository.class
+com/planttracker/Config/JacksonConfig.class
 com/planttracker/Services/PlantTypeService.class

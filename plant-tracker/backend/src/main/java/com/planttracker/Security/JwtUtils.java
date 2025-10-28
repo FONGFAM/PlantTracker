@@ -2,6 +2,8 @@ package com.planttracker.Security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
     private static final String SECRET_KEY = "ThisIsASecretKeyForJwtGenerationInPlantTracker123456"; // >= 32 chars
 
     private Key getSigningKey() {
@@ -37,7 +40,7 @@ public class JwtUtils {
         try {
             return extractAllClaims(token).getSubject();
         } catch (Exception e) {
-            System.out.println("⚠️ extractUsername error: " + e.getMessage());
+            logger.warn("extractUsername error: {}", e.getMessage());
             return null;
         }
     }
@@ -49,7 +52,7 @@ public class JwtUtils {
                 return ((List<?>) roles).stream().map(Object::toString).collect(Collectors.toList());
             }
         } catch (Exception e) {
-            System.out.println("⚠️ extractRoles error: " + e.getMessage());
+            logger.warn("extractRoles error: {}", e.getMessage());
         }
         return new ArrayList<>();
     }

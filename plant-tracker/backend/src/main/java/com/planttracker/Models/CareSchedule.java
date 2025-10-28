@@ -7,7 +7,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "care_schedules")
+@Table(name = "care_schedules", indexes = {
+          @Index(name = "idx_schedule_plant_id", columnList = "plant_id"),
+          @Index(name = "idx_schedule_next_at", columnList = "nextAt"),
+          @Index(name = "idx_schedule_type", columnList = "type")
+})
 public class CareSchedule {
 
      @Id

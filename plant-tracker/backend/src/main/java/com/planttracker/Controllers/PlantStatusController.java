@@ -50,4 +50,19 @@ public class PlantStatusController {
           service.deleteStatus(statusId);
           return ResponseEntity.noContent().build();
      }
+
+     // 🔹 Xóa nhiều trạng thái cùng lúc (bulk delete)
+     @DeleteMapping("/bulk")
+     public ResponseEntity<String> bulkDeleteStatuses(@RequestBody List<Long> ids) {
+          service.bulkDeleteStatuses(ids);
+          return ResponseEntity.ok("Đã xóa " + ids.size() + " trạng thái");
+     }
+
+     // 🔹 Thêm nhiều trạng thái cho một cây (bulk create)
+     @PostMapping("/plant/{plantId}/bulk")
+     public ResponseEntity<List<PlantStatus>> bulkCreateStatuses(
+               @PathVariable Long plantId,
+               @RequestBody List<PlantStatus> statuses) {
+          return ResponseEntity.ok(service.bulkCreateStatuses(plantId, statuses));
+     }
 }

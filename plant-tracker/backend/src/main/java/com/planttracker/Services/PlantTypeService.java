@@ -2,6 +2,8 @@ package com.planttracker.Services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,6 +36,12 @@ public class PlantTypeService {
                     .anyMatch(r -> r.equals("ROLE_ADMIN"));
      }
 
+     // Paginated list
+     public Page<PlantTypes> list(Pageable pageable) {
+          return repo.findAll(pageable);
+     }
+
+     // Non-paginated list (backward compatibility)
      public List<PlantTypes> list() {
           return repo.findAll();
      }

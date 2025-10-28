@@ -6,6 +6,9 @@ import java.util.Map;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -57,11 +60,41 @@ public class ReportController {
           return ResponseEntity.ok(list);
      }
 
+     // Get reports with pagination (ordered by date desc)
+     @GetMapping("/plant/{plantId}/paginated")
+     public ResponseEntity<Page<PlantReport>> getReportsPaginated(
+               @PathVariable Long plantId,
+               @RequestParam(defaultValue = "0") int page,
+               @RequestParam(defaultValue = "10") int size,
+               Authentication auth) {
+          Pageable pageable = PageRequest.of(page, size);
+          Page<PlantReport> reports = plantReportService.getReportsForPlantPaginated(plantId, pageable);
+          return ResponseEntity.ok(reports);
+     }
+
      // Delete a report (only owner of report)
      @DeleteMapping("/plant/{id}")
      public ResponseEntity<Void> deleteReport(@PathVariable Long id, Authentication auth) {
           plantReportService.deleteReport(id, auth.getName());
           return ResponseEntity.noContent().build();
+     }
+
+     // Bulk delete reports
+     @DeleteMapping("/bulk")
+     public ResponseEntity<String> bulkDeleteReports(@RequestBody List<Long> ids, Authentication auth) {
+          plantReportService.bulkDeleteReports(ids, auth.getName());
+          return ResponseEntity.ok("Đã xóa " + ids.size() + " báo cáo");
+     }
+
+     // Bulk create reports for a plant
+     @PostMapping("/plant/{plantId}/bulk")
+     public ResponseEntity<List<PlantReport>> bulkAddReports(
+               @PathVariable Long plantId,
+               @RequestBody List<PlantReport> reports,
+               Authentication auth) {
+          String username = auth.getName();
+          List<PlantReport> created = plantReportService.bulkAddReports(plantId, username, reports);
+          return ResponseEntity.status(HttpStatus.CREATED).body(created);
      }
 
      // Export Excel for a plant

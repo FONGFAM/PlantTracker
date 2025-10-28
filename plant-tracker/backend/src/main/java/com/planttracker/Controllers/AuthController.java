@@ -9,6 +9,8 @@ import com.planttracker.Services.CustomUserDetailsService;
 import com.planttracker.dto.LoginRequest;
 import com.planttracker.dto.RegisterRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.authentication.*;
@@ -17,15 +19,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -49,24 +51,24 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            System.out.println("🔍 Login attempt for user: " + loginRequest.getUsername());
+            logger.info("Login attempt for user: {}", loginRequest.getUsername());
 
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
                             loginRequest.getPassword()));
 
-            System.out.println("✅ Authentication successful for: " + loginRequest.getUsername());
+            logger.info("Authentication successful for: {}", loginRequest.getUsername());
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
             String token = jwtUtils.generateJwtToken(userDetails);
-            System.out.println("🎫 JWT token generated");
+            logger.debug("JWT token generated for user: {}", loginRequest.getUsername());
 
             // Lấy thông tin user đầy đủ
             Users user = userRepo.findByUsername(loginRequest.getUsername()).orElse(null);
 
             if (user != null) {
-                System.out.println("👤 User found: " + user.getUsername() + " with roles: " + user.getRoles().size());
+                logger.info("User found: {} with {} roles", user.getUsername(), user.getRoles().size());
                 // Tạo response với đầy đủ thông tin
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", token);
@@ -74,17 +76,16 @@ public class AuthController {
                 response.put("roles", user.getRoles());
                 return ResponseEntity.ok(response);
             } else {
-                System.out.println("❌ User not found in database");
+                logger.warn("User not found in database: {}", loginRequest.getUsername());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
             }
 
         } catch (BadCredentialsException e) {
-            System.out.println("❌ Bad credentials for user: " + loginRequest.getUsername());
+            logger.warn("Bad credentials for user: {}", loginRequest.getUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         } catch (Exception e) {
-            System.out.println("❌ Login error: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login failed: " + e.getMessage());
+            logger.error("Login error for user: {}", loginRequest.getUsername(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login failed");
         }
     }
 
@@ -92,15 +93,15 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         try {
-            System.out.println("🔍 Register attempt for user: " + registerRequest.getUsername());
+            logger.info("Register attempt for user: {}", registerRequest.getUsername());
 
             // Kiểm tra trùng username/email
             if (userRepo.existsByUsername(registerRequest.getUsername())) {
-                System.out.println("❌ Username already exists: " + registerRequest.getUsername());
+                logger.warn("Username already exists: {}", registerRequest.getUsername());
                 return ResponseEntity.badRequest().body("Username is already taken");
             }
             if (userRepo.existsByEmail(registerRequest.getEmail())) {
-                System.out.println("❌ Email already exists: " + registerRequest.getEmail());
+                logger.warn("Email already exists: {}", registerRequest.getEmail());
                 return ResponseEntity.badRequest().body("Email is already in use");
             }
 
@@ -112,7 +113,7 @@ public class AuthController {
             // Mã hoá mật khẩu
             String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
             user.setPassword(encodedPassword);
-            System.out.println("🔐 Password encoded successfully");
+            logger.debug("Password encoded successfully for user: {}", registerRequest.getUsername());
 
             // Set createdAt
             user.setCreatedAt(LocalDateTime.now());
@@ -121,18 +122,17 @@ public class AuthController {
             Role userRole = roleRepo.findByName("ROLE_USER")
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             user.setRoles(List.of(userRole));
-            System.out.println("👤 Role assigned: " + userRole.getName());
+            logger.info("Role assigned: {}", userRole.getName());
 
             // Lưu vào database
             Users savedUser = userRepo.save(user);
-            System.out.println("✅ User saved successfully with ID: " + savedUser.getId());
+            logger.info("User registered successfully: {} (ID: {})", savedUser.getUsername(), savedUser.getId());
 
             return ResponseEntity.ok("User created successfully!");
         } catch (Exception e) {
-            System.out.println("❌ Register error: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Registration failed for username: {}", registerRequest.getUsername(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Registration failed: " + e.getMessage());
+                    .body("Registration failed");
         }
     }
 

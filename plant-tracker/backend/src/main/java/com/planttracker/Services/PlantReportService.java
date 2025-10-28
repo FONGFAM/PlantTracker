@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -61,6 +63,11 @@ public class PlantReportService {
           return reportRepo.findByPlant_IdOrderByDateAsc(plantId);
      }
 
+     // Get reports with pagination
+     public Page<PlantReport> getReportsForPlantPaginated(Long plantId, Pageable pageable) {
+          return reportRepo.findByPlant_IdOrderByDateDesc(plantId, pageable);
+     }
+
      public void deleteReport(Long id, String username) {
           PlantReport r = reportRepo.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -68,6 +75,48 @@ public class PlantReportService {
                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed");
           }
           reportRepo.deleteById(id);
+     }
+
+     // Bulk delete reports
+     @Transactional
+     public void bulkDeleteReports(List<Long> ids, String username) {
+          // Validate ownership for all reports
+          for (Long id : ids) {
+               PlantReport r = reportRepo.findById(id)
+                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                   "Report " + id + " not found"));
+               if (!r.getUser().getUsername().equals(username)) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't own report " + id);
+               }
+          }
+          // If all validations pass, delete all
+          reportRepo.deleteAllById(ids);
+     }
+
+     // Bulk create reports
+     @Transactional
+     public List<PlantReport> bulkAddReports(Long plantId, String username, List<PlantReport> reports) {
+          Plants plant = plantRepo.findById(plantId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
+          Users user = userRepo.findByUsername(username)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+          // Validate plant ownership
+          if (!plant.getUser().getUsername().equals(username)) {
+               throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't own this plant");
+          }
+
+          // Set common fields for all reports
+          LocalDate now = LocalDate.now();
+          for (PlantReport report : reports) {
+               report.setPlant(plant);
+               report.setUser(user);
+               if (report.getDate() == null) {
+                    report.setDate(now);
+               }
+          }
+
+          return reportRepo.saveAll(reports);
      }
 
      // Export to excel

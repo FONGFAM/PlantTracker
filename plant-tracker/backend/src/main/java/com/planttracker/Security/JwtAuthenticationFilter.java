@@ -2,6 +2,8 @@ package com.planttracker.Security;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,8 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -26,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        System.out.println("🔍 JWT Filter triggered for: " + request.getServletPath());
+        logger.debug("JWT Filter triggered for: {}", request.getServletPath());
 
         // ✅ Bỏ qua preflight OPTIONS requests
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -42,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("🚫 No Authorization header or invalid format");
+            logger.debug("No Authorization header or invalid format");
             filterChain.doFilter(request, response);
             return;
         }
@@ -52,22 +56,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             username = jwtUtils.extractUsername(jwt);
-            System.out.println("👤 Extracted username: " + username);
+            logger.debug("Extracted username: {}", username);
         } catch (Exception e) {
-            System.out.println("❌ JWT extraction failed: " + e.getMessage());
+            logger.warn("JWT extraction failed: {}", e.getMessage());
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtUtils.validateToken(jwt, userDetails)) {
-                System.out.println("✅ Token valid for user: " + username);
+                logger.debug("Token valid for user: {}", username);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
-                System.out.println("❌ Invalid token for user: " + username);
+                logger.warn("Invalid token for user: {}", username);
             }
         }
 

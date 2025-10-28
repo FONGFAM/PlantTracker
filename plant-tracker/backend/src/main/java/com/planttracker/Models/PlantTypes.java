@@ -22,6 +22,12 @@ public class PlantTypes {
     @OneToMany(mappedBy = "plantType")
     @JsonIgnore
     private List<Plants> plants;
+
+    // Transient field to return plant count without loading all plants
+    public int getPlantCount() {
+        return plants != null ? plants.size() : 0;
+    }
+
     // GETTERS AND SETTERS
 
     public Long getId() {

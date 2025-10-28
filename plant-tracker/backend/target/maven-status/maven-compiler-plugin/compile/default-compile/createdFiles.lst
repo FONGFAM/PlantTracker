@@ -2,7 +2,6 @@ com/planttracker/Security/JwtUtils.class
 com/planttracker/Security/SecurityConfig.class
 com/planttracker/Models/PlantReport.class
 com/planttracker/Services/PlantService.class
-com/planttracker/App.class
 com/planttracker/Repositories/PlantRepository.class
 com/planttracker/Repositories/PlantStatusRepository.class
 com/planttracker/Models/PlantTypes.class
@@ -16,11 +15,13 @@ com/planttracker/Services/UserServices.class
 com/planttracker/Repositories/PlantTypeRepository.class
 com/planttracker/Repositories/PlantReportRepository.class
 com/planttracker/BackendApplication.class
+com/planttracker/Models/CareSchedule.class
 com/planttracker/Models/Role.class
 com/planttracker/Controllers/AuthController.class
 com/planttracker/dto/RegisterRequest.class
 com/planttracker/Services/PlantStatusService.class
 com/planttracker/Models/Posts.class
+com/planttracker/Services/AIService.class
 com/planttracker/dto/JwtResponse.class
 com/planttracker/Services/PlantAnalyticsExcelService.class
 com/planttracker/Security/DataInitializer.class

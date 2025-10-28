@@ -131,4 +131,58 @@ public class PlantStatusService {
 
           statusRepo.delete(status);
      }
+
+     // 🔹 Xóa nhiều trạng thái cùng lúc (bulk delete)
+     @Transactional
+     public void bulkDeleteStatuses(List<Long> ids) {
+          Authentication auth = getAuth();
+          if (auth == null) {
+               throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+          }
+
+          // Verify ownership for all statuses
+          for (Long id : ids) {
+               PlantStatus status = statusRepo.findById(id)
+                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                   "Status " + id + " not found"));
+
+               if (!status.getPlants().getUser().getUsername().equals(auth.getName())) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete status " + id);
+               }
+          }
+
+          // Delete all if authorized
+          statusRepo.deleteAllById(ids);
+     }
+
+     // 🔹 Thêm nhiều trạng thái cho một cây (bulk create)
+     @Transactional
+     public List<PlantStatus> bulkCreateStatuses(Long plantId, List<PlantStatus> statuses) {
+          Authentication auth = getAuth();
+          if (auth == null) {
+               throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+          }
+
+          // Kiểm tra quyền truy cập cây
+          Plants plant = plantRepo.findByIdAndUser_Username(plantId, auth.getName())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
+
+          LocalDateTime now = LocalDateTime.now();
+
+          for (PlantStatus status : statuses) {
+               // Validate
+               if (status.getStatus() == null || status.getStatus().trim().isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status is required");
+               }
+               if (status.getDescription() == null || status.getDescription().trim().isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description is required");
+               }
+
+               // Set thông tin
+               status.setPlants(plant);
+               status.setUpdateAt(now);
+          }
+
+          return statusRepo.saveAll(statuses);
+     }
 }

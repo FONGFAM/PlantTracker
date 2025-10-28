@@ -1,0 +1,104 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.planttracker:backend >----------------------
+[INFO] Building Plant Tracker Backend 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.5:run (default-cli) > test-compile @ backend >>>
+[INFO] 
+[INFO] --- enforcer:3.5.0:enforce (enforce-java) @ backend ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory /Users/phonguni/workspace/gittest/PlantTracker/plant-tracker/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.3.5:run (default-cli) < test-compile @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.5:run (default-cli) @ backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2025-10-28T11:05:08.553+07:00  INFO 17652 --- [           main] com.planttracker.BackendApplication      : Starting BackendApplication using Java 23.0.2 with PID 17652 (/Users/phonguni/workspace/gittest/PlantTracker/plant-tracker/backend/target/classes started by phonguni in /Users/phonguni/workspace/gittest/PlantTracker/plant-tracker/backend)
+2025-10-28T11:05:08.556+07:00  INFO 17652 --- [           main] com.planttracker.BackendApplication      : No active profile set, falling back to 1 default profile: "default"
+2025-10-28T11:05:09.317+07:00  INFO 17652 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-28T11:05:09.388+07:00  INFO 17652 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 63 ms. Found 7 JPA repository interfaces.
+2025-10-28T11:05:10.003+07:00  INFO 17652 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2025-10-28T11:05:10.022+07:00  INFO 17652 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-28T11:05:10.023+07:00  INFO 17652 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2025-10-28T11:05:10.084+07:00  INFO 17652 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-10-28T11:05:10.086+07:00  INFO 17652 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1453 ms
+2025-10-28T11:05:10.160+07:00  INFO 17652 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-28T11:05:10.671+07:00  INFO 17652 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@35787726
+2025-10-28T11:05:10.672+07:00  INFO 17652 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-28T11:05:10.775+07:00  INFO 17652 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-28T11:05:10.855+07:00  INFO 17652 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2025-10-28T11:05:10.890+07:00  INFO 17652 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-28T11:05:11.216+07:00  INFO 17652 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-28T11:05:11.284+07:00  WARN 17652 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-28T11:05:11.285+07:00  WARN 17652 --- [           main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-28T11:05:12.269+07:00  INFO 17652 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: alter table plant_reports modify column note TEXT
+Hibernate: alter table plant_status modify column description LONGTEXT
+Hibernate: alter table plant_status modify column imageurl LONGTEXT
+Hibernate: alter table plants modify column description LONGTEXT
+Hibernate: alter table plants modify column image_url LONGTEXT
+2025-10-28T11:05:12.451+07:00  INFO 17652 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-28T11:05:12.914+07:00  INFO 17652 --- [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2025-10-28T11:05:12.961+07:00  INFO 17652 --- [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-28T11:05:13.734+07:00  WARN 17652 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-28T11:05:13.993+07:00 DEBUG 17652 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, JwtAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-10-28T11:05:14.213+07:00  INFO 17652 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2025-10-28T11:05:14.222+07:00  INFO 17652 --- [           main] com.planttracker.BackendApplication      : Started BackendApplication in 6.106 seconds (process running for 6.552)
+Hibernate: select count(*) from roles r1_0
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: select u1_0.id from users u1_0 where u1_0.username=? limit ?
+ Plant Tracker backend running on http://localhost:8081
+2025-10-28T11:06:07.906+07:00  INFO 17652 --- [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-10-28T11:06:07.907+07:00  INFO 17652 --- [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-10-28T11:06:07.908+07:00  INFO 17652 --- [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-10-28T11:06:07.926+07:00 DEBUG 17652 --- [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/plant-types
+2025-10-28T11:06:07.935+07:00 DEBUG 17652 --- [nio-8081-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-10-28T11:06:07.937+07:00 DEBUG 17652 --- [nio-8081-exec-1] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-10-28T11:06:07.944+07:00 DEBUG 17652 --- [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /error
+2025-10-28T11:06:07.944+07:00 DEBUG 17652 --- [nio-8081-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-10-28T11:06:07.945+07:00 DEBUG 17652 --- [nio-8081-exec-1] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-10-28T11:06:23.815+07:00 DEBUG 17652 --- [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/plant-types
+2025-10-28T11:06:23.815+07:00 DEBUG 17652 --- [nio-8081-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-10-28T11:06:23.815+07:00 DEBUG 17652 --- [nio-8081-exec-2] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+2025-10-28T11:06:23.816+07:00 DEBUG 17652 --- [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /error
+2025-10-28T11:06:23.817+07:00 DEBUG 17652 --- [nio-8081-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-10-28T11:06:23.817+07:00 DEBUG 17652 --- [nio-8081-exec-2] o.s.s.w.a.Http403ForbiddenEntryPoint     : Pre-authenticated entry point called. Rejecting access
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:50 min
+[INFO] Finished at: 2025-10-28T11:07:55+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.5:run (default-cli) on project backend: Process terminated with exit code: 137 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

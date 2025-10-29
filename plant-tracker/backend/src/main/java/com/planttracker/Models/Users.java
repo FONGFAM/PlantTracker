@@ -24,6 +24,7 @@ import jakarta.persistence.Table;
         @Index(name = "idx_username", columnList = "username"),
         @Index(name = "idx_email", columnList = "email")
 })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "password" })
 public class Users {
 
     @Id

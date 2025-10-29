@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        logger.debug("JWT Filter triggered for: {}", request.getServletPath());
+        logger.info("🔒 JWT Filter: {} {}", request.getMethod(), request.getServletPath());
 
         // ✅ Bỏ qua preflight OPTIONS requests
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.debug("No Authorization header or invalid format");
+            logger.warn("❌ No Authorization header or invalid format for: {}", request.getServletPath());
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,9 +56,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             username = jwtUtils.extractUsername(jwt);
-            logger.debug("Extracted username: {}", username);
+            logger.info("✅ Extracted username: {}", username);
         } catch (Exception e) {
-            logger.warn("JWT extraction failed: {}", e.getMessage());
+            logger.error("❌ JWT extraction failed: {}", e.getMessage());
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

@@ -2,6 +2,7 @@ package com.planttracker.Models;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +21,7 @@ import jakarta.persistence.Table;
         @Index(name = "idx_plant_type_id", columnList = "plant_type_id"),
         @Index(name = "idx_plant_create_date", columnList = "createDate")
 })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Plants {
 
     @Id

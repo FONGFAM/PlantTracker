@@ -1,5 +1,6 @@
 package com.planttracker.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -8,6 +9,7 @@ import java.time.LocalDate;
           @Index(name = "idx_report_plant_id", columnList = "plant_id"),
           @Index(name = "idx_report_date", columnList = "date")
 })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class PlantReport {
 
      @Id
@@ -26,15 +28,17 @@ public class PlantReport {
      @Column(columnDefinition = "TEXT")
      private String note;
 
-     @Column(length = 255)
-     private String imageUrl; // optional: image recorded
+     @Column(columnDefinition = "LONGTEXT")
+     private String imageUrl; // Base64 encoded image can be very long
 
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "plant_id", nullable = false)
+     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "user", "plantReports" })
      private Plants plant;
 
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "user_id", nullable = false)
+     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "password", "plants", "roles" })
      private Users user;
 
      // constructors

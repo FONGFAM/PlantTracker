@@ -8,8 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.planttracker.Models.CareSchedule;
 
@@ -53,6 +55,11 @@ public interface CareScheduleRepository extends JpaRepository<CareSchedule, Long
      List<CareSchedule> findByPlant_Id(Long plantId);
 
      List<CareSchedule> findByPlant_User_Username(String username);
+
+     // Delete methods for cascade delete
+     @Modifying
+     @Transactional
+     void deleteByPlantId(Long plantId);
 
      // JpaRepository đã cung cấp sẵn hàm findAll(Pageable pageable)
      // Page<CareSchedule> findAll(Pageable pageable); // ✨ Không cần khai báo lại

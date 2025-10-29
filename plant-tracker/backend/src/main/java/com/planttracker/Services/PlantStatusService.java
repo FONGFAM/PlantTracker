@@ -13,6 +13,7 @@ import com.planttracker.Models.Plants;
 import com.planttracker.Models.PlantStatus;
 import com.planttracker.Repositories.PlantRepository;
 import com.planttracker.Repositories.PlantStatusRepository;
+import org.springframework.security.core.GrantedAuthority;
 
 @Service
 public class PlantStatusService {
@@ -30,18 +31,68 @@ public class PlantStatusService {
           return SecurityContextHolder.getContext().getAuthentication();
      }
 
-     // 🔹 Lấy danh sách trạng thái của một cây
+     // 🔹 Kiểm tra quyền admin
+     private boolean isAdmin() {
+          Authentication auth = getAuth();
+          if (auth == null || auth.getAuthorities() == null)
+               return false;
+
+          return auth.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(r -> r.equals("ROLE_ADMIN"));
+     }
+
+     // 🔹 Normalize health status to Vietnamese
+     private String normalizeHealthStatus(String status) {
+          if (status == null)
+               return "Không xác định";
+
+          String s = status.toLowerCase();
+          if (s.contains("excellent") || s.contains("xuất sắc"))
+               return "Xuất sắc";
+          if (s.contains("good") || s.contains("khỏe") || s.contains("tốt") || s.contains("healthy"))
+               return "Khỏe mạnh";
+          if (s.contains("fair") || s.contains("trung bình"))
+               return "Trung bình";
+          if (s.contains("warning") || s.contains("cảnh báo"))
+               return "Cảnh báo";
+          if (s.contains("sick") || s.contains("bệnh") || s.contains("yếu"))
+               return "Bệnh";
+          if (s.contains("critical") || s.contains("nghiêm trọng"))
+               return "Nghiêm trọng";
+
+          return status; // Return original if no match
+     }
+
+     // 🔹 Lấy tất cả trạng thái của một cây
      public List<PlantStatus> getPlantStatuses(Long plantId) {
           Authentication auth = getAuth();
           if (auth == null) {
                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
           }
 
-          // Kiểm tra quyền truy cập cây
-          Plants plant = plantRepo.findByIdAndUser_Username(plantId, auth.getName())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
+          // Admin có thể xem tất cả, user chỉ xem của mình
+          if (!isAdmin()) {
+               // Kiểm tra quyền truy cập cây
+               plantRepo.findByIdAndUser_Username(plantId, auth.getName())
+                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                   "Access denied to this plant"));
+          } else {
+               // Admin: verify plant exists
+               plantRepo.findById(plantId)
+                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
+          }
 
-          return statusRepo.findByPlants_IdOrderByUpdateAtAsc(plantId);
+          List<PlantStatus> statuses = statusRepo.findByPlants_IdOrderByUpdateAtAsc(plantId);
+
+          // Normalize all statuses to Vietnamese
+          statuses.forEach(status -> {
+               if (status.getStatus() != null) {
+                    status.setStatus(normalizeHealthStatus(status.getStatus()));
+               }
+          });
+
+          return statuses;
      }
 
      // 🔹 Tạo trạng thái mới cho cây
@@ -77,14 +128,29 @@ public class PlantStatusService {
                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
           }
 
-          // Kiểm tra quyền truy cập cây
-          Plants plant = plantRepo.findByIdAndUser_Username(plantId, auth.getName())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
+          // Admin có thể xem tất cả, user chỉ xem của mình
+          if (!isAdmin()) {
+               // Kiểm tra quyền truy cập cây
+               plantRepo.findByIdAndUser_Username(plantId, auth.getName())
+                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                   "Access denied to this plant"));
+          } else {
+               // Admin: verify plant exists
+               plantRepo.findById(plantId)
+                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
+          }
 
-          return statusRepo.findByPlants_IdOrderByUpdateAtAsc(plantId)
+          PlantStatus latestStatus = statusRepo.findByPlants_IdOrderByUpdateAtAsc(plantId)
                     .stream()
                     .reduce((first, second) -> second)
                     .orElse(null);
+
+          // Normalize status to Vietnamese
+          if (latestStatus != null && latestStatus.getStatus() != null) {
+               latestStatus.setStatus(normalizeHealthStatus(latestStatus.getStatus()));
+          }
+
+          return latestStatus;
      }
 
      // 🔹 Cập nhật trạng thái

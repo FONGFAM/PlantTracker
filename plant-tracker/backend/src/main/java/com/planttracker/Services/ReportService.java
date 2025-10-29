@@ -48,6 +48,28 @@ public class ReportService {
                     .anyMatch(r -> r.equals("ROLE_ADMIN"));
      }
 
+     // 🔹 Normalize health status to Vietnamese
+     private String normalizeHealthStatus(String status) {
+          if (status == null)
+               return "Không xác định";
+
+          String s = status.toLowerCase();
+          if (s.contains("excellent") || s.contains("xuất sắc"))
+               return "Xuất sắc";
+          if (s.contains("good") || s.contains("khỏe") || s.contains("tốt"))
+               return "Khỏe mạnh";
+          if (s.contains("fair") || s.contains("trung bình"))
+               return "Trung bình";
+          if (s.contains("warning") || s.contains("cảnh báo"))
+               return "Cảnh báo";
+          if (s.contains("sick") || s.contains("bệnh") || s.contains("yếu"))
+               return "Bệnh";
+          if (s.contains("critical") || s.contains("nghiêm trọng"))
+               return "Nghiêm trọng";
+
+          return "Không xác định";
+     }
+
      public Map<String, Object> generateSummary(Authentication auth) {
           Authentication currentAuth = getAuth();
           if (currentAuth == null)
@@ -75,10 +97,72 @@ public class ReportService {
                               && p.getCreateDate().toLocalDate().getYear() == now.getYear())
                     .count();
 
+          // Calculate health statistics from PlantReports
+          List<PlantReport> allReports = new ArrayList<>();
+          for (Plants plant : plants) {
+               allReports.addAll(plantReportRepository.findByPlant_IdOrderByDateAsc(plant.getId()));
+          }
+
+          // Count health status from reports
+          Map<String, Long> healthStats = new HashMap<>();
+          long totalReportsWithHealth = 0;
+          long healthyCount = 0;
+
+          for (PlantReport report : allReports) {
+               if (report.getHealthStatus() != null && !report.getHealthStatus().isEmpty()) {
+                    totalReportsWithHealth++;
+                    String status = report.getHealthStatus().toLowerCase();
+
+                    // Count for health rate calculation
+                    if (status.contains("good") || status.contains("excellent") ||
+                              status.contains("khỏe") || status.contains("tốt")) {
+                         healthyCount++;
+                    }
+
+                    // Group by status for chart
+                    String normalizedStatus = normalizeHealthStatus(status);
+                    healthStats.put(normalizedStatus, healthStats.getOrDefault(normalizedStatus, 0L) + 1);
+               }
+          }
+
+          // Calculate health rate percentage
+          String healthRate = "N/A";
+          if (totalReportsWithHealth > 0) {
+               double rate = (healthyCount * 100.0) / totalReportsWithHealth;
+               healthRate = String.format("%.1f%%", rate);
+          }
+
+          // Count recent reports (last 7 days)
+          LocalDate sevenDaysAgo = now.minusDays(7);
+          long recentReports = allReports.stream()
+                    .filter(r -> r.getDate().isAfter(sevenDaysAgo))
+                    .count();
+
+          // Calculate monthly report trends (last 6 months)
+          Map<String, Long> monthlyReports = new LinkedHashMap<>();
+          for (int i = 5; i >= 0; i--) {
+               LocalDate monthDate = now.minusMonths(i);
+               String monthKey = monthDate.getMonth().toString().substring(0, 3) + " " + monthDate.getYear();
+
+               long count = allReports.stream()
+                         .filter(r -> r.getDate().getMonthValue() == monthDate.getMonthValue()
+                                   && r.getDate().getYear() == monthDate.getYear())
+                         .count();
+
+               monthlyReports.put(monthKey, count);
+          }
+
           Map<String, Object> result = new HashMap<>();
           result.put("totalPlants", totalPlants);
           result.put("plantsByType", plantsByType);
           result.put("newPlantsThisMonth", newPlantsThisMonth);
+
+          // Add missing fields for frontend
+          result.put("totalTypes", plantsByType.size());
+          result.put("recentReports", recentReports);
+          result.put("healthRate", healthRate);
+          result.put("healthStats", healthStats); // Add health statistics for chart
+          result.put("monthlyReports", monthlyReports); // Add monthly trend data
 
           return result;
      }

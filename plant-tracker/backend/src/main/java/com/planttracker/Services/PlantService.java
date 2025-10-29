@@ -21,6 +21,9 @@ import com.planttracker.Models.PlantTypes;
 import com.planttracker.Repositories.PlantRepository;
 import com.planttracker.Repositories.UserRepository;
 import com.planttracker.Repositories.PlantTypeRepository;
+import com.planttracker.Repositories.CareScheduleRepository;
+import com.planttracker.Repositories.PlantReportRepository;
+import com.planttracker.Repositories.PlantStatusRepository;
 
 @Service
 public class PlantService {
@@ -30,11 +33,19 @@ public class PlantService {
     private final PlantRepository repo;
     private final UserRepository userRepo;
     private final PlantTypeRepository plantTypeRepo;
+    private final CareScheduleRepository careScheduleRepo;
+    private final PlantReportRepository plantReportRepo;
+    private final PlantStatusRepository plantStatusRepo;
 
-    public PlantService(PlantRepository repo, UserRepository userRepo, PlantTypeRepository plantTypeRepo) {
+    public PlantService(PlantRepository repo, UserRepository userRepo, PlantTypeRepository plantTypeRepo,
+            CareScheduleRepository careScheduleRepo, PlantReportRepository plantReportRepo,
+            PlantStatusRepository plantStatusRepo) {
         this.repo = repo;
         this.userRepo = userRepo;
         this.plantTypeRepo = plantTypeRepo;
+        this.careScheduleRepo = careScheduleRepo;
+        this.plantReportRepo = plantReportRepo;
+        this.plantStatusRepo = plantStatusRepo;
     }
 
     // 🔹 Lấy Authentication hiện tại từ SecurityContext
@@ -186,7 +197,19 @@ public class PlantService {
             }
         }
 
-        // Delete all if authorized
+        // Delete related data first (cascade delete)
+        for (Long plantId : ids) {
+            // Delete care schedules
+            careScheduleRepo.deleteByPlantId(plantId);
+
+            // Delete plant reports
+            plantReportRepo.deleteByPlantId(plantId);
+
+            // Delete plant status
+            plantStatusRepo.deleteByPlantsId(plantId);
+        }
+
+        // Finally delete the plants
         repo.deleteAllById(ids);
     }
 

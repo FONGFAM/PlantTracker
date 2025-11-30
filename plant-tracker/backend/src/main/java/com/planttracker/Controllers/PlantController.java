@@ -82,7 +82,7 @@ public class PlantController {
             logger.error("Error creating plant for user: {}",
                     plant.getUser() != null ? plant.getUser().getId() : "unknown", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("❌ Lỗi khi thêm cây: " + e.getMessage());
+                    .body(" Lỗi khi thêm cây: " + e.getMessage());
         }
     }
 

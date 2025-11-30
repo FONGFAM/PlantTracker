@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.warn("❌ No Authorization header or invalid format for: {}", request.getServletPath());
+            logger.warn(" No Authorization header or invalid format for: {}", request.getServletPath());
             filterChain.doFilter(request, response);
             return;
         }
@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtUtils.extractUsername(jwt);
             logger.info("✅ Extracted username: {}", username);
         } catch (Exception e) {
-            logger.error("❌ JWT extraction failed: {}", e.getMessage());
+            logger.error(" JWT extraction failed: {}", e.getMessage());
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
